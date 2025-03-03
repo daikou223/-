@@ -164,7 +164,7 @@ const gowinter = [4,4,3,4,
                 4,4];
 //関数*********************************************
 //アイテムを選択したときの関数
-function select(selectTo){
+function select(selectTo:number){
   if(selection.value !== selectTo){
     selection.value = selectTo
   }else if(selection.value == selectTo){
@@ -172,7 +172,7 @@ function select(selectTo){
   }
 }
 //フィールドへの干渉を実装する関数
-function plant(fildNo){
+function plant(fildNo:number){
   let able = true;
   //すべての素材が足りているかどうかの判定
   for(let i = 0;i<materialJpgs.length;i++){
