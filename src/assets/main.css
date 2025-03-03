@@ -1,0 +1,99 @@
+@import './base.css';
+
+#app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-weight: normal;
+}
+
+a,
+.green {
+  text-decoration: none;
+  color: hsla(160, 100%, 37%, 1);
+  transition: 0.4s;
+  padding: 3px;
+}
+td img{
+  width:130px;
+  margin:10px;
+}
+td div img{
+  width:60px;
+}
+
+.green{
+  height:80px;
+  background-color:lightgreen;
+  border-radius:10px;
+  border:2px solid black;
+}
+.selectGreen{
+  height:80px;
+  background-color:lightgreen;
+  border-radius:10px;
+  border:2px solid red;
+}
+.darkgreen{
+  height:80px;
+  background-color:rgb(5, 75, 5);
+  border-radius:10px;
+  border:2px solid black;
+}
+
+.yellow{
+  height:80px;
+  background-color:rgb(223, 223, 49);
+  border-radius:10px;
+  border:2px solid black;
+}
+.selectYellow{
+  height:80px;
+  background-color:rgb(223, 223, 49);
+  border-radius:10px;
+  border:2px solid red;
+}
+.darkyellow{
+  height:80px;
+  background-color:rgb(109, 109, 13);
+  border-radius:10px;
+  border:2px solid black;
+}
+
+.gray{
+  height:80px;
+  background-color:lightgray;
+  border-radius:10px;
+  border:2px solid black;
+}
+.selectGray{
+  height:80px;
+  background-color:lightgray;
+  border-radius:10px;
+  border:2px solid red;
+}
+.darkGray{
+  height:80px;
+  background-color:gray;
+  border-radius:10px;
+  border:2px solid black;
+}
+
+@media (hover: hover) {
+  a:hover {
+    background-color: hsla(160, 100%, 37%, 0.2);
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    display: flex;
+    place-items: center;
+  }
+
+  #app {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 0 2rem;
+  }
+}
