@@ -22,10 +22,11 @@ import wood from './assets/wood.png';
 import mugi from './assets/mugi.png';
 import stone from './assets/stone.png';
 
-// 変数管理部分
+// 変数管理部分*********************************
 let intervalId: number | null = null; // Interval ID を保存
 const debug: boolean = false;
-
+//定数
+const SRANSITION_PERSENTAGE = 0.3;
 // ハンドにある場合の CSS クラス
 const materialcolors: string[] = ["green", "yellow", "gray"];
 const selectMaterialcolors: string[] = ["selectGreen", "selectYellow", "selectGray"];
@@ -139,14 +140,14 @@ const fetchDataInInterval = () => {
       }
     }else{
       for(let i = 0;i<4;i++){
-        if(Math.random()<0.2 || debug){
+        if(Math.random()<SRANSITION_PERSENTAGE || debug){
           conditions.value[i] = growth[conditions.value[i]]
         }
       }
     }
     //ご神木の判定
     if(conditions.value.includes(12)){
-      if(Math.random()<0.2 || debug){
+      if(Math.random()<SRANSITION_PERSENTAGE || debug){
          mag.value++
       }
     }
