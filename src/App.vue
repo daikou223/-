@@ -1,167 +1,92 @@
 <script setup lang="ts">
 //地面のテクスチャはクレジット表示必須 https://jp.freepik.com/free-vector/game-ground-textures_13050184.html
 //画像の入れ込みを行う
-import dirt from './assets/dirt.jpg'
-import coty from './assets/coty.png'
-import tree from './assets/tree.png'
-import deadtree from './assets/deadtree.png'
-import winter from './assets/winter.png'
-import kusa from './assets/kusa.png'
-import ine from './assets/ine.png'
-import isi from './assets/isi.png'
-import fire from './assets/fire.png'
-import stones from './assets/stones.png'
-import ike from './assets/ike.png'
-import Gcoty from './assets/gosinnbokucoty.png'
-import gosinnboku from './assets/gosinnboku.png'
-import fir from './assets/fir.png'
+import { ref, onMounted } from 'vue';
 
-import wood from './assets/wood.png'
-import mugi from './assets/mugi.png'
-import stone from './assets/stone.png'
-import {ref,onMounted} from 'vue';
+// 地面のテクスチャ（クレジット表示必須）
+import dirt from './assets/dirt.jpg';
+import coty from './assets/coty.png';
+import tree from './assets/tree.png';
+import deadtree from './assets/deadtree.png';
+import winter from './assets/winter.png';
+import kusa from './assets/kusa.png';
+import ine from './assets/ine.png';
+import isi from './assets/isi.png';
+import fire from './assets/fire.png';
+import stones from './assets/stones.png';
+import ike from './assets/ike.png';
+import Gcoty from './assets/gosinnbokucoty.png';
+import gosinnboku from './assets/gosinnboku.png';
+import fir from './assets/fir.png';
+import wood from './assets/wood.png';
+import mugi from './assets/mugi.png';
+import stone from './assets/stone.png';
 
-//変数管理部分
+// 変数管理部分
 let intervalId: number | null = null; // Interval ID を保存
-//デバッグモード
-const debug = false;
-//ハンドにある場合のCSSクラス
-const materialcolors = ["green","yellow","gray"]
-//ハンドにある場合のCSSクラス
-const selectMaterialcolors = ["selectGreen","selectYellow","selectGray"]
-//ハンドにない場合のCSSクラス
-const darkmaterialcolors = ["darkgreen","darkyellow","darkGray"]
-//画像をつなぎ込み
-const materialJpgs = [wood,mugi,stone]
-//手持ちの状態
-let handNum = ref([1,0,0]);
-//現在選択しているもの
-let selection = ref(0);
-//時間概念
-let time = ref(0);
-//ご神木倍率
-let mag = ref(1);
-//フィールドの画像
-const grandJpgs = [dirt,coty,tree,deadtree,
-                  winter,kusa,ine,isi
-                  ,fire,stones,ike,Gcoty,
-                gosinnboku,fir];
-//フィールドの状態
-let conditions = ref([0,0,0,0]);
-const fildNutorition = Math.floor(Math.random()*5)+3
-//フィールドへの操作一覧[前の状態][itemごとの挙動]
-//=>[遷移先番号,各素材の増減]]
-const operate = [
-  //dirt:0
-  [
-    [0,[0,0,0]],
-    [1,[-1,0,0]],
-    [5,[0,-3,0]],
-    [9,[0,0,-3]],
-  ],
-  //coty:1
-  [
-    [1,[0,0,0]],
-    [1,[0,0,0]],
-    [1,[0,0,0]],
-    [1,[0,0,0]],
-  ],
-  //tree:2
-  [
-    [0,[fildNutorition,0,0]],
-    [0,[fildNutorition,0,0]],
-    [0,[fildNutorition,0,0]],
-    [0,[fildNutorition,0,0]],
-  ],
-  //deadtree:3
-  [
-    [3,[0,0,0]],
-    [3,[0,0,0]],
-    [3,[0,0,0]],
-    [8,[0,0,-1]],
-  ],
-  //winter:4
-  [
-    [4,[0,0,0]],
-    [4,[0,0,0]],
-    [4,[0,0,0]],
-    [4,[0,0,0]],
-  ],
-  //kusa:5
-  [
-    [5,[0,0,0]],
-    [5,[0,0,0]],
-    [5,[0,0,0]],
-    [5,[0,0,0]],
-  ],
-  //ine:6
-  [
-    [0,[0,fildNutorition,0]],
-    [0,[0,fildNutorition,0]],
-    [0,[0,fildNutorition,0]],
-    [0,[0,fildNutorition,0]],
-  ],
-  //stone:7
-  [
-    [0,[0,0,1]],
-    [0,[0,0,1]],
-    [0,[0,0,1]],
-    [0,[0,0,1]],
-  ],
-  //fire:8
-  [
-    [8,[0,0,0]],
-    [8,[0,0,0]],
-    [8,[0,0,0]],
-    [0,[0,0,-1]],
-  ],
-  //stones:9
-  [
-    [9,[0,0,0]],
-    [11,[-1,0,0]],
-    [5,[0,-1,0]],
-    [9,[0,0,0]],
-  ],
-  //ike:10 仕様削除
-  [
-    [10,[0,0,0]],
-    [10,[0,0,0]],
-    [6,[0,-1,0]],
-    [10,[0,0,0]],
-  ],
-  //ご神木の芽:11
-  [
-    [11,[0,0,0]],
-    [11,[0,0,0]],
-    [11,[0,0,0]],
-    [11,[0,0,0]],
-  ],
-  //ご神木:12
-  [
-    [12,[0,0,0]],
-    [12,[0,0,0]],
-    [12,[0,0,0]],
-    [12,[0,0,1]],
-  ],
-  //fir:13
-  [
-    [13,[0,0,0]],
-    [8,[-5,0,0]],
-    [8,[0,-1,0]],
-    [12,[0,0,1]],
-  ],
+const debug: boolean = false;
+
+// ハンドにある場合の CSS クラス
+const materialcolors: string[] = ["green", "yellow", "gray"];
+const selectMaterialcolors: string[] = ["selectGreen", "selectYellow", "selectGray"];
+const darkmaterialcolors: string[] = ["darkgreen", "darkyellow", "darkGray"];
+
+// 画像リスト
+const materialJpgs: string[] = [wood, mugi, stone];
+const grandJpgs: string[] = [
+  dirt, coty, tree, deadtree, winter, kusa, ine, isi,
+  fire, stones, ike, Gcoty, gosinnboku, fir
 ];
-const operAble = [false,false,true]
-//時間経過による遷移[前の状態]
-const growth = [7,2,2,5,
-                0,6,6,0,
-                13,9,0,12,
-                12,0];
-//冬に入ったタイミングでの遷移
-const gowinter = [4,4,3,4,
-                  4,4,4,4,
-                  4,9,10,4,
-                4,4];
+
+// 状態管理
+let handNum = ref<number[]>([1, 0, 0]);
+let selection = ref<number>(0);
+let time = ref<number>(0);
+let mag = ref<number>(1);
+let conditions = ref<number[]>([0, 0, 0, 0]);
+
+// フィールドの栄養値
+const fildNutorition: number = Math.floor(Math.random() * 5) + 3;
+
+// 操作一覧: [前の状態][アイテムごとの挙動: [遷移先番号, 各素材の増減]]
+const operate: [number, number[]][][] = [
+  // dirt: 0
+  [[0, [0, 0, 0]], [1, [-1, 0, 0]], [5, [0, -3, 0]], [9, [0, 0, -3]]],
+  // coty: 1
+  [[1, [0, 0, 0]], [1, [0, 0, 0]], [1, [0, 0, 0]], [1, [0, 0, 0]]],
+  // tree: 2
+  [[0, [fildNutorition, 0, 0]], [0, [fildNutorition, 0, 0]], [0, [fildNutorition, 0, 0]], [0, [fildNutorition, 0, 0]]],
+  // deadtree: 3
+  [[3, [0, 0, 0]], [3, [0, 0, 0]], [3, [0, 0, 0]], [8, [0, 0, -1]]],
+  // winter: 4
+  [[4, [0, 0, 0]], [4, [0, 0, 0]], [4, [0, 0, 0]], [4, [0, 0, 0]]],
+  // kusa: 5
+  [[5, [0, 0, 0]], [5, [0, 0, 0]], [5, [0, 0, 0]], [5, [0, 0, 0]]],
+  // ine: 6
+  [[0, [0, fildNutorition, 0]], [0, [0, fildNutorition, 0]], [0, [0, fildNutorition, 0]], [0, [0, fildNutorition, 0]]],
+  // stone: 7
+  [[0, [0, 0, 1]], [0, [0, 0, 1]], [0, [0, 0, 1]], [0, [0, 0, 1]]],
+  // fire: 8
+  [[8, [0, 0, 0]], [8, [0, 0, 0]], [8, [0, 0, 0]], [0, [0, 0, -1]]],
+  // stones: 9
+  [[9, [0, 0, 0]], [11, [-1, 0, 0]], [5, [0, -1, 0]], [9, [0, 0, 0]]],
+  // ご神木の芽: 11
+  [[11, [0, 0, 0]], [11, [0, 0, 0]], [11, [0, 0, 0]], [11, [0, 0, 0]]],
+  // ご神木: 12
+  [[12, [0, 0, 0]], [12, [0, 0, 0]], [12, [0, 0, 0]], [12, [0, 0, 1]]],
+  // fir: 13
+  [[13, [0, 0, 0]], [8, [-5, 0, 0]], [8, [0, -1, 0]], [12, [0, 0, 1]]],
+];
+
+// 操作可能フラグ
+const operAble: boolean[] = [false, false, true];
+
+// 時間経過による遷移（前の状態）
+const growth: number[] = [7, 2, 2, 5, 0, 6, 6, 0, 13, 9, 0, 12, 12, 0];
+
+// 冬に入ったタイミングでの遷移
+const gowinter: number[] = [4, 4, 3, 4, 4, 4, 4, 4, 4, 9, 10, 4, 4, 4];
+
 //関数*********************************************
 //アイテムを選択したときの関数
 function select(selectTo:number){
