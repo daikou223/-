@@ -150,11 +150,12 @@ const fetchDataInInterval = () => {
     }
     //10年度になったら終了
     if(time.value == 120){
+      if (value !== null) {
       clearInterval(intervalId);
       intervalId = null; // IDをリセット
       window.confirm(`${handNum.value[0]+handNum.value[1]+handNum.value[2]} pt`)
     }
-    console.log(time.value);
+  }
   }, debug ? 10000:3000)
 }
 // コンポーネントがマウントされたら定期実行を開始
