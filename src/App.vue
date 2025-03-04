@@ -18,9 +18,16 @@ import ike from './assets/ike.png';
 import Gcoty from './assets/gosinnbokucoty.png';
 import gosinnboku from './assets/gosinnboku.png';
 import fir from './assets/fir.png';
+import nenndo from './assets/nenndo.png';
+import rennga from './assets/rennga.png';
+import rofire from './assets/rofire.png';
+import rofir from './assets/rofir.png';
+
+
 import wood from './assets/wood.png';
 import mugi from './assets/mugi.png';
 import stone from './assets/stone.png';
+import renga from './assets/renga.png';
 
 // 変数管理部分*********************************
 let intervalId: number | null = null; // Interval ID を保存
@@ -28,19 +35,19 @@ const debug: boolean = false;
 //定数
 const SRANSITION_PERSENTAGE = 0.3;
 // ハンドにある場合の CSS クラス
-const materialcolors: string[] = ["green", "yellow", "gray"];
-const selectMaterialcolors: string[] = ["selectGreen", "selectYellow", "selectGray"];
-const darkmaterialcolors: string[] = ["darkgreen", "darkyellow", "darkGray"];
+const materialcolors: string[] = ["green", "yellow", "gray","orange"];
+const selectMaterialcolors: string[] = ["selectGreen", "selectYellow", "selectGray","selectOrange"];
+const darkmaterialcolors: string[] = ["darkgreen", "darkyellow", "darkGray","darkOrange"];
 
 // 画像リスト
-const materialJpgs: string[] = [wood, mugi, stone];
+const materialJpgs: string[] = [wood, mugi, stone,renga];
 const grandJpgs: string[] = [
-  dirt, coty, tree, deadtree, winter, kusa, ine, isi,
-  fire, stones, ike, Gcoty, gosinnboku, fir
+  dirt, coty, tree, deadtree, winter, kusa, ine, isi,fire, stones,
+  ike, Gcoty, gosinnboku, fir, nenndo, rennga, rofire ,rofir
 ];
 
 // 状態管理
-let handNum = ref<number[]>([1, 0, 0]);
+let handNum = ref<number[]>([1, 0, 0, 0]);
 let selection = ref<number>(0);
 let time = ref<number>(0);
 let mag = ref<number>(1);
@@ -52,43 +59,161 @@ const fildNutorition: number = Math.floor(Math.random() * 5) + 3;
 // 操作一覧: [前の状態][アイテムごとの挙動: [遷移先番号, 各素材の増減]]
 const operate: [number, number[]][][] = [
   // dirt: 0
-  [[0, [0, 0, 0]], [1, [-1, 0, 0]], [0, [0, 0, 0]], [9, [0, 0, -3]]],
+  [
+    [0, [0, 0, 0,0]],
+    [1, [-1, 0, 0,0]],
+    [0, [0, 0, 0,0]],
+    [9, [0, 0, -3]],
+    [0, [0, 0, 0,0]]
+  ],
   // coty: 1
-  [[1, [0, 0, 0]], [1, [0, 0, 0]], [1, [0, 0, 0]], [1, [0, 0, 0]]],
+  [
+    [1, [0, 0, 0,0]],
+    [1, [0, 0, 0,0]], 
+    [1, [0, 0, 0,0]], 
+    [14, [0, 0, -1,0]],
+    [1, [0, 0, 0,0]]
+  ],
   // tree: 2
-  [[0, [fildNutorition, 0, 0]], [0, [fildNutorition, 0, 0]], [0, [fildNutorition, 0, 0]], [0, [fildNutorition, 0, 0]]],
+  [
+    [0, [fildNutorition, 0, 0,0]], 
+    [0, [fildNutorition, 0, 0,0]], 
+    [0, [fildNutorition, 0, 0,0]], 
+    [0, [fildNutorition, 0, 0,0]],
+    [0, [fildNutorition, 0, 0,0]],
+  ],
   // deadtree: 3
-  [[3, [0, 0, 0]], [3, [0, 0, 0]], [3, [0, 0, 0]], [8, [0, 0, -1]]],
+  [
+    [3, [0, 0, 0,0]], 
+    [3, [0, 0, 0,0]], 
+    [3, [0, 0, 0,0]], 
+    [8, [0, 0, -1,0]],
+    [3, [0, 0, 0,0]], 
+  ],
   // winter: 4
-  [[4, [0, 0, 0]], [4, [0, 0, 0]], [4, [0, 0, 0]], [4, [0, 0, 0]]],
+  [
+    [4, [0, 0, 0,0]], 
+    [4, [0, 0, 0,0]], 
+    [4, [0, 0, 0,0]], 
+    [4, [0, 0, 0,0]],
+    [4, [0, 0, 0,0]],
+  ],
   // kusa: 5
-  [[5, [0, 0, 0]], [5, [0, 0, 0]], [5, [0, 0, 0]], [5, [0, 0, 0]]],
+  [
+    [5, [0, 0, 0,0]],
+    [5, [0, 0, 0,0]], 
+    [5, [0, 0, 0,0]], 
+    [5, [0, 0, 0,0]],
+    [5, [0, 0, 0,0]],
+  ],
   // ine: 6
-  [[0, [0, fildNutorition, 0]], [0, [0, fildNutorition, 0]], [0, [0, fildNutorition, 0]], [0, [0, fildNutorition, 0]]],
+  [
+    [0, [0, fildNutorition, 0,0]], 
+    [0, [0, fildNutorition, 0,0]], 
+    [0, [0, fildNutorition, 0,0]], 
+    [0, [0, fildNutorition, 0,0]],
+    [0, [0, fildNutorition, 0,0]],
+  ],
   // stone: 7
-  [[0, [0, 0, 1]], [0, [0, 0, 1]], [0, [0, 0, 1]], [0, [0, 0, 1]]],
+  [
+    [0, [0, 0, 1,0]], 
+    [0, [0, 0, 1,0]], 
+    [0, [0, 0, 1,0]], 
+    [0, [0, 0, 1,0]],
+    [0, [0, 0, 1,0]],
+  ],
   // fire: 8
-  [[8, [0, 0, 0]], [8, [0, 0, 0]], [8, [0, 0, 0]], [0, [0, 0, -1]]],
+  [
+    [8, [0, 0, 0,0]], 
+    [8, [0, 0, 0,0]], 
+    [8, [0, 0, 0,0]], 
+    [0, [0, 0, -1,0]],
+    [0, [0, 0, -1,0]],
+  ],
   // stones: 9
-  [[9, [0, 0, 0]], [11, [-1, 0, 0]], [5, [0, -1, 0]], [9, [0, 0, 0]]],
+  [
+    [9, [0, 0, 0,0]], 
+    [11, [-1, 0, 0,0]], 
+    [5, [0, -1, 0,0]], 
+    [9, [0, 0, 0,0]],
+    [9, [0, 0, 0,0]],
+  ],
   // ike: 10 仕様変更により削除
-  [[9, [0, 0, 0]], [11, [-1, 0, 0]], [5, [0, -1, 0]], [9, [0, 0, 0]]],
+  [
+    [9, [0, 0, 0,0]], 
+    [11, [-1, 0, 0,0]], 
+    [5, [0, -1, 0,0]], 
+    [9, [0, 0, 0,0]],
+    [9, [0, 0, 0,0]],
+  ],
   // ご神木の芽: 11
-  [[11, [0, 0, 0]], [11, [0, 0, 0]], [11, [0, 0, 0]], [11, [0, 0, 0]]],
+  [
+    [11, [0, 0, 0,0]], 
+    [11, [0, 0, 0,0]], 
+    [11, [0, 0, 0,0]], 
+    [11, [0, 0, 0,0]],
+    [11, [0, 0, 0,0]],
+  ],
   // ご神木: 12
-  [[12, [0, 0, 0]], [12, [0, 0, 0]], [12, [0, 0, 0]], [12, [0, 0, 1]]],
+  [
+    [12, [0, 0, 0,0]], 
+    [12, [0, 0, 0,0]], 
+    [12, [0, 0, 0,0]], 
+    [12, [0, 0, 0, 0]],
+    [12, [0, 0, 0, 0]],
+  ],
   // fir: 13
-  [[13, [0, 0, 0]], [8, [-5, 0, 0]], [8, [0, -1, 0]], [0, [0, -1, 0]]],
+  [
+    [13, [0, 0, 0,0]], 
+    [8, [-5, 0, 0,0]], 
+    [8, [0, -1, 0,0]], 
+    [0, [0, -1, 0,0]],
+    [13, [0, 0, 0,0]],
+  ],
+  // 粘土: 14
+  [
+    [14, [0, 0, 0,0]], 
+    [14, [0, 0, 0,0]], 
+    [14, [0, 0, 0,0]], 
+    [14, [0, 0, 0,0]],
+    [14, [0, 0, 0,0]],
+  ],
+   // れんが: 15
+  [
+    [0, [0, 0, 0, 1]], 
+    [0, [0, 0, 0, 1]], 
+    [0, [0, 0, 0, 1]], 
+    [0, [0, 0, 0, 1]],
+    [0, [0, 0, 0, 1]],
+  ],
+    // 炎炉: 16
+  [
+    [16, [0, 0, 0,0]], 
+    [16, [0, 0, 0,0]], 
+    [16, [0, 0, 0,0]], 
+    [16, [0, 0, 0,0]],
+    [16, [0, 0, 0,0]],
+  ],
+   // 火炉: 17
+  [
+    [17, [0, 0, 0,0]], 
+    [16, [-1, 0, 0,0]], 
+    [16, [0, -1, 0,0]], 
+    [17, [0, 0, 0,0]],
+    [17, [0, 0, 0,0]],
+  ],
 ];
 
 // 操作可能フラグ
 const operAble: boolean[] = [false, false, true];
 
 // 時間経過による遷移（前の状態）
-const growth: number[] = [7, 2, 2, 5, 0, 6, 6, 0, 13, 9, 0, 12, 12, 0];
+const growth: number[] = [7, 2, 2, 5, 0, 6, 6, 0, 13, 9,
+                          0, 12, 12, 0 , 15,15,17,0];
 
 // 冬に入ったタイミングでの遷移
-const gowinter: number[] = [4, 4, 3, 4, 4, 4, 4, 4, 4, 9, 10, 4, 4, 4];
+const gowinter: number[] = [4, 4, 3, 4, 4, 4, 4, 4, 4, 9, 
+                            10, 4, 4, 4, 4, 4, 4, 4];
 
 //関数*********************************************
 //アイテムを選択したときの関数
@@ -134,7 +259,7 @@ const fetchDataInInterval = () => {
     }
     time.value++;
     //冬に入るタイミング
-    if((time.value+3)%12+1 == 1 && !(conditions.value.includes(8))){
+    if((time.value+3)%12+1 == 1 && !(conditions.value.includes(8)) && !(conditions.value.includes(16))){
       for(let i = 0;i<4;i++){
         conditions.value[i] = gowinter[conditions.value[i]]
       }
