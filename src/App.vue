@@ -333,7 +333,7 @@ let handNum = ref<number[]>([1, 0, 0, 0]);
 let selection = ref<number>(0);
 let time = ref<number>(0);
 let mag = ref<number>(1);
-let fild_condition: Fild[] = ref<Fild[]>([new Dirt(),new Dirt(),new Dirt(),new Dirt()]);
+let fild_condition = ref<Fild[]>([new Dirt(),new Dirt(),new Dirt(),new Dirt()]);
 
 //関数*********************************************
 //アイテムを選択したときの関数
