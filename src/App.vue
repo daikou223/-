@@ -37,7 +37,7 @@ class Fild{
   constructor(image:string){
     this.image = image;
   }
-  doClick(matel){
+  doClick(matel:number){
     switch(matel){
       default: return this.nodoing();
     }
@@ -45,7 +45,7 @@ class Fild{
   gowinter(){
     return new Winter();
   }
-  goTime(){
+  goTime():Fild{
     return this;
   }
   nodoing(){
@@ -58,7 +58,7 @@ class Winter extends Fild{
   constructor(){
     super(winter);
   }
-  goTime(){
+  goTime(): Fild{
     if(Math.random()<0.3){
       return new Dirt();
     }else{
@@ -333,7 +333,7 @@ let handNum = ref<number[]>([1, 0, 0, 0]);
 let selection = ref<number>(0);
 let time = ref<number>(0);
 let mag = ref<number>(1);
-let fild_condition: Fild[] = ref<Fild[]>([new Dart(),new Dart(),new Dart(),new Dart()]);
+let fild_condition: Fild[] = ref<Fild[]>([new Dirt(),new Dirt(),new Dirt(),new Dirt()]);
 
 //関数*********************************************
 //アイテムを選択したときの関数
