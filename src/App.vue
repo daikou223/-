@@ -329,11 +329,11 @@ const darkmaterialcolors: string[] = ["darkgreen", "darkyellow", "darkGray","dar
 const materialJpgs: string[] = [wood, mugi, stone,renga];
 
 // 状態管理
-let handNum = ref<number[]>([100, 100, 100, 100]);
+let handNum = ref<number[]>([1, 0, 0, 0]);
 let selection = ref<number>(0);
 let time = ref<number>(0);
 let mag = ref<number>(1);
-let fild_condition: fild[] = ref<Fild[]>([new Deadtree(),new Deadtree(),new Deadtree(),new Deadtree()]);
+let fild_condition: Fild[] = ref<Fild[]>([new Dart(),new Dart(),new Dart(),new Dart()]);
 
 //関数*********************************************
 //アイテムを選択したときの関数
@@ -350,7 +350,7 @@ const fetchDataInInterval = () => {
   intervalId = setInterval(() => {
     if(debug){
       console.log("手持ち",handNum.value);
-      console.log("フィールド",conditions.value);
+      console.log("フィールド",fild_condition.value);
       console.log("倍率",mag.value);
     }
     time.value++;
