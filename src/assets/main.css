@@ -7,8 +7,7 @@
   font-weight: normal;
 }
 
-a,
-.green {
+a{
   text-decoration: none;
   color: hsla(160, 100%, 37%, 1);
   transition: 0.4s;
@@ -74,7 +73,26 @@ td div img{
 }
 .darkGray{
   height:80px;
-  background-color:gray;
+  background-color:rgba(128, 128, 128, 0.63);
+  border-radius:10px;
+  border:2px solid black;
+}
+
+.orange{
+  height:80px;
+  background-color:orange;
+  border-radius:10px;
+  border:2px solid black;
+}
+.selectOrange{
+  height:80px;
+  background-color:orange;
+  border-radius:10px;
+  border:2px solid red;
+}
+.darkOrange{
+  height:80px;
+  background-color:rgba(133, 96, 28, 0.767);
   border-radius:10px;
   border:2px solid black;
 }
