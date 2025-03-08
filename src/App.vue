@@ -37,18 +37,18 @@ class Fild{
   constructor(image:string){
     this.image = image;
   }
-  doClick(matel:number){
+  doClick(matel:number):Fild{
     switch(matel){
       default: return this.nodoing();
     }
   }
-  gowinter(){
+  gowinter():Fild{
     return new Winter();
   }
   goTime():Fild{
     return this;
   }
-  nodoing(){
+  nodoing():Fild{
     console.log("操作未割り当て")
     return this;
   }
@@ -58,7 +58,7 @@ class Winter extends Fild{
   constructor(){
     super(winter);
   }
-  goTime(): Fild{
+  goTIme():Fild{
     if(Math.random()<0.3){
       return new Dirt();
     }else{
@@ -71,14 +71,14 @@ class Dirt extends Fild{
   constructor(){
     super(dirt);
   }
-  goTime(){
+  goTIme():Fild{
     if(Math.random() < 0.3){
       return new Stone();
     }else{
       return this;
     }
   }
-  doClick(matel){
+  doClick(matel:number):Fild{
     switch(matel){
       case 1:
         return this.plant();
@@ -91,14 +91,14 @@ class Dirt extends Fild{
         break;
     }
   }
-  plant(){
+  plant():Fild{
     if(handNum.value[0]>0){
       handNum.value[0]--;
       return new Coty();
     }
     return new Dirt();
   }
-  set(){
+  set():Fild{
     if(handNum.value[2]>5){
       handNum.value[2] -= 5;
       return new Stones();
@@ -111,7 +111,7 @@ class Coty extends Fild{
   constructor(){
     super(coty);
   }
-  goTime(){
+  goTIme():Fild{
     if(Math.random()<0.3){
       return new Tree();
     }
@@ -123,16 +123,16 @@ class Tree extends Fild{
   constructor(){
     super(tree);
   }
-  doClick(matel){
+  doClick(matel:number):Fild{
     switch(matel){
       default:
         return this.harvest();
     }
   }
-  gowinter(){
+  gowinter():Fild{
     return new Deadtree()
   }
-  harvest(){
+  harvest():Fild{
     handNum.value[0] += (Math.floor(Math.random()*5)+3)*mag.value;
     return new Dirt()
   }
@@ -142,7 +142,7 @@ class Deadtree extends Fild{
   constructor(){
     super(deadtree);
   }
-  doClick(matel){
+  doClick(matel:number):Fild{
     switch(matel){
       case 3:
         return this.ignition();
@@ -150,13 +150,13 @@ class Deadtree extends Fild{
         return this;
     }
   }
-  goTime(){
+  goTIme():Fild{
     if(Math.random() < 0.5){
       return new Kusa()
     }
     return this;
   }
-  ignition(){
+  ignition():Fild{
     console.log(handNum.value[2],"発火")
     if(handNum.value[2] >= 1){
       handNum.value[2]--;
@@ -170,10 +170,10 @@ class Stone extends Fild{
   constructor(){
     super(isi);
   }
-  goTime(){
+  goTIme():Fild{
     return new Dirt();
   }
-  doClick(matel){
+  doClick(matel:number):Fild{
     handNum.value[2] += mag.value;
     return new Dirt();
   }
@@ -183,13 +183,13 @@ class Kusa extends Fild{
   constructor(){
     super(kusa)
   }
-  goTime(){
+  goTIme():Fild{
     if(Math.random() <0.3){
       return new Ine()
     }
     return this;
   }
-  doClick(matel){
+  doClick(matel:number):Fild{
     switch(matel){
       case 3:
         return this.crush();
@@ -198,18 +198,19 @@ class Kusa extends Fild{
         return this;
     }
   }
-  crush(){
+  crush():Fild{
     if(handNum.value[2] > 0 ){
       handNum.value[2]--
       return new Nenndo();
     }
   }
 }
+
 class Ine extends Fild{
   constructor(){
     super(ine)
   }
-  doClick(matel){
+  doClick(matel:number):Fild{
     handNum.value[1] += (Math.floor(Math.random()*5)+3)*mag.value
     return new Dirt()
   }
@@ -219,7 +220,7 @@ class Fire extends Fild{
   constructor(){
     super(fire);
   }
-  goTime(){
+  goTIme():Fild{
     if(Math.floor(Math.random()<0.3)){
       return new Fir();
     }
@@ -231,13 +232,13 @@ class Fir extends Fild{
   constructor(){
     super(fir);
   }
-  goTime(){
+  goTIme():Fild{
     if(Math.floor(Math.random()<0.3)){
       return new Dirt();
     }
     return this;
   }
-  doClick(matel){
+  doClick(matel:number):Fild{
     switch(matel){
       case 2:
         return this.stoke()
@@ -245,7 +246,7 @@ class Fir extends Fild{
         return this
     }
   }
-  stoke(){
+  stoke():Fild{
     if(handNum.value[1] > 0){
       handNum.value[1]--;
       return new Fire(); 
@@ -258,8 +259,8 @@ class Gcoty extends Fild{
   constructor(){
     super(gcoty);
   }
-  goTime(){
-    if(Math.floor(Math.random()<0.3)){
+  goTIme():Fild{
+    if(Math.random()<0.3){
       return new Gosinnboku();
     }
     return this;
@@ -270,8 +271,8 @@ class Gosinnboku extends Fild{
   constructor(){
     super(gosinnboku);
   }
-  goTime(){
-    if(Math.floor(Math.random()<0.3)){
+  goTIme():Fild{
+    if(Math.random()<0.3){
       mag.value++;
     }
     return this;
@@ -282,7 +283,7 @@ class Stones extends Fild{
   constructor(){
     super(stones);
   }
-  doClick(matel){
+  doClick(matel:number):Fild{
     switch(matel){
       case 1:
         return this.plant()
@@ -290,7 +291,7 @@ class Stones extends Fild{
         return this
     }
   }
-  plant(){
+  plant():Fild{
     if(handNum.value[0] > 0){
       handNum.value[0]--;
       return new Gcoty(); 
@@ -303,7 +304,7 @@ class Nenndo extends Fild{
   constructor(){
     super(nenndo)
   }
-  goTime(){
+  goTIme():Fild{
     if(Math.random() < 0.3){
       return new Rennga();
     }
@@ -315,7 +316,7 @@ class Rennga extends Fild{
   constructor(){
     super(rennga)
   }
-  doClick(){
+  doClick():Fild{
     handNum.value[3] += mag.value;
     return new Dirt();
   }
