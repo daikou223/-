@@ -203,6 +203,7 @@ class Kusa extends Fild{
       handNum.value[2]--
       return new Nenndo();
     }
+    return this;
   }
 }
 
@@ -221,7 +222,7 @@ class Fire extends Fild{
     super(fire);
   }
   goTIme():Fild{
-    if(Math.floor(Math.random()<0.3)){
+    if(Math.random()<0.3){
       return new Fir();
     }
     return this;
@@ -233,7 +234,7 @@ class Fir extends Fild{
     super(fir);
   }
   goTIme():Fild{
-    if(Math.floor(Math.random()<0.3)){
+    if(Math.random()<0.3){
       return new Dirt();
     }
     return this;
