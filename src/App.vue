@@ -31,7 +31,10 @@ import renga from './assets/renga.png';
 // 変数管理部分*********************************
 let intervalId: number | null = null; // Interval ID を保存
 const debug: boolean = false;
-
+let frag = ref<number>(0);
+let dateClass = ref<string>("");
+let scores = ref<number[]>([]); 
+//クラス管理************************************
 class Fild{
   image: string;
   constructor(image:string){
@@ -45,7 +48,7 @@ class Fild{
   gowinter():Fild{
     return new Winter();
   }
-  goTime():Fild{
+  gotime():Fild{
     return this;
   }
   nodoing():Fild{
@@ -58,7 +61,7 @@ class Winter extends Fild{
   constructor(){
     super(winter);
   }
-  goTIme():Fild{
+  gotime():Fild{
     if(Math.random()<0.3){
       return new Dirt();
     }else{
@@ -71,7 +74,7 @@ class Dirt extends Fild{
   constructor(){
     super(dirt);
   }
-  goTIme():Fild{
+  gotime():Fild{
     if(Math.random() < 0.3){
       return new Stone();
     }else{
@@ -99,7 +102,7 @@ class Dirt extends Fild{
     return new Dirt();
   }
   set():Fild{
-    if(handNum.value[2]>5){
+    if(handNum.value[2]>=5){
       handNum.value[2] -= 5;
       return new Stones();
     }
@@ -111,7 +114,7 @@ class Coty extends Fild{
   constructor(){
     super(coty);
   }
-  goTIme():Fild{
+  gotime():Fild{
     if(Math.random()<0.3){
       return new Tree();
     }
@@ -150,7 +153,7 @@ class Deadtree extends Fild{
         return this;
     }
   }
-  goTIme():Fild{
+  gotime():Fild{
     if(Math.random() < 0.5){
       return new Kusa()
     }
@@ -170,7 +173,7 @@ class Stone extends Fild{
   constructor(){
     super(isi);
   }
-  goTIme():Fild{
+  gotime():Fild{
     return new Dirt();
   }
   doClick(matel:number):Fild{
@@ -183,7 +186,7 @@ class Kusa extends Fild{
   constructor(){
     super(kusa)
   }
-  goTIme():Fild{
+  gotime():Fild{
     if(Math.random() <0.3){
       return new Ine()
     }
@@ -191,19 +194,9 @@ class Kusa extends Fild{
   }
   doClick(matel:number):Fild{
     switch(matel){
-      case 3:
-        return this.crush();
-        break;
       default:
         return this;
     }
-  }
-  crush():Fild{
-    if(handNum.value[2] > 0 ){
-      handNum.value[2]--
-      return new Nenndo();
-    }
-    return this;
   }
 }
 
@@ -221,7 +214,7 @@ class Fire extends Fild{
   constructor(){
     super(fire);
   }
-  goTIme():Fild{
+  gotime():Fild{
     if(Math.random()<0.3){
       return new Fir();
     }
@@ -233,7 +226,7 @@ class Fir extends Fild{
   constructor(){
     super(fir);
   }
-  goTIme():Fild{
+  gotime():Fild{
     if(Math.random()<0.3){
       return new Dirt();
     }
@@ -260,7 +253,7 @@ class Gcoty extends Fild{
   constructor(){
     super(gcoty);
   }
-  goTIme():Fild{
+  gotime():Fild{
     if(Math.random()<0.3){
       return new Gosinnboku();
     }
@@ -272,7 +265,7 @@ class Gosinnboku extends Fild{
   constructor(){
     super(gosinnboku);
   }
-  goTIme():Fild{
+  gotime():Fild{
     if(Math.random()<0.3){
       mag.value++;
     }
@@ -301,37 +294,17 @@ class Stones extends Fild{
   }
 }
 
-class Nenndo extends Fild{
-  constructor(){
-    super(nenndo)
-  }
-  goTIme():Fild{
-    if(Math.random() < 0.3){
-      return new Rennga();
-    }
-    return this;
-  }
-}
 
-class Rennga extends Fild{
-  constructor(){
-    super(rennga)
-  }
-  doClick():Fild{
-    handNum.value[3] += mag.value;
-    return new Dirt();
-  }
-}
 // ハンドにある場合の CSS クラス
 const materialcolors: string[] = ["green", "yellow", "gray","orange"];
 const selectMaterialcolors: string[] = ["selectGreen", "selectYellow", "selectGray","selectOrange"];
 const darkmaterialcolors: string[] = ["darkgreen", "darkyellow", "darkGray","darkOrange"];
 
 // 画像リスト
-const materialJpgs: string[] = [wood, mugi, stone,renga];
+const materialJpgs: string[] = [wood, mugi, stone];
 
 // 状態管理
-let handNum = ref<number[]>([1, 0, 0, 0]);
+let handNum = ref<number[]>([1, 0, 0]);
 let selection = ref<number>(0);
 let time = ref<number>(0);
 let mag = ref<number>(1);
@@ -356,6 +329,21 @@ const fetchDataInInterval = () => {
       console.log("倍率",mag.value);
     }
     time.value++;
+    //6年12月になったら終了
+    if(time.value == 69){
+      frag.value = 0
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+      scores.value.push(handNum.value[0]+handNum.value[1]+handNum.value[2])
+      localStorage.setItem("score",scores.value.join(" "))
+      window.confirm(`最終得点は${handNum.value[0]+handNum.value[1]+handNum.value[2]}点でした`)
+    }
+    //最後が近くなったら赤くする
+    if(time.value >= 57){
+      dateClass.value = "red"
+    }
     //冬の実装
     //火が存在するなら、冬を迎えない
     let winterFlag = true;
@@ -373,7 +361,7 @@ const fetchDataInInterval = () => {
       //時間経過
       console.log(fild_condition.value);
       for(let i = 0;i<4;i++){
-        fild_condition.value[i] = fild_condition.value[i].goTime();
+        fild_condition.value[i] = fild_condition.value[i].gotime();
       }
     }
   }, debug ? 10000:3000)
@@ -386,12 +374,47 @@ function click(fildNum:number){
   }
   console.log(fild_condition.value);
 }
+
+const startgame = ()=>{
+  let scoresString:string[] = []
+  if(localStorage.getItem("score")){
+    const storedScore = localStorage.getItem("score");
+    console.log(storedScore);
+    if(storedScore !== null){
+      scoresString = storedScore.split(" ");
+    }
+  }
+  scores.value = []
+  for(let i = 0;i<scoresString.length;i++){
+    let scoreNumber = Number(scoresString[i])
+    let p = 0
+    for(let j = 0;j<scores.value.length;j++){
+      if(scores.value[j] > scoreNumber){
+        p++
+      }
+    }
+    scores.value.splice(p,0,scoreNumber)
+  }
+  dateClass.value = "";
+  handNum.value =[1, 0, 0];
+  selection.value = 0;
+  time.value = 0;
+  mag.value = 1;
+  fild_condition.value = [new Dirt(),new Dirt(),new Dirt(),new Dirt()];
+  frag.value = 1
+  fetchDataInInterval();
+}
 // コンポーネントがマウントされたら定期実行を開始
-onMounted(fetchDataInInterval)
 </script>
 
 <template>
+  <div v-if = "frag == 0">
+    <button @click = "startgame" class = "startButton">開始</button>
+    </div>
+    <div v-else>
+      <div v-bind:class = "dateClass">
   {{ Math.floor(time / 12)+1 }}年度{{ (time+3)%12+1 }}月
+  </div>
   <!-- フィールドの状態を描画 -->
   <table class = "rey">
     <tr>
@@ -440,4 +463,10 @@ onMounted(fetchDataInInterval)
     </tr>
   </table>
   <p>倍率:x{{ mag }}</p>
+  <table>
+    <tr v-for = "s in Math.min(scores.length,5)">
+      <td>{{ scores[s-1] }}</td>
+    </tr>
+  </table>
+  </div>
 </template>
