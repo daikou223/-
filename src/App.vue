@@ -17,16 +17,11 @@ import stones from './assets/stones.png';
 import gcoty from './assets/gosinnbokucoty.png';
 import gosinnboku from './assets/gosinnboku.png';
 import fir from './assets/fir.png';
-import nenndo from './assets/nenndo.png';
-import rennga from './assets/rennga.png';
-//import rofire from './assets/rofire.png';
-//import rofir from './assets/rofir.png';
 
 
 import wood from './assets/wood.png';
 import mugi from './assets/mugi.png';
 import stone from './assets/stone.png';
-import renga from './assets/renga.png';
 
 // 変数管理部分*********************************
 let intervalId: number | null = null; // Interval ID を保存
