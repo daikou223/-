@@ -27,8 +27,11 @@ import stone from './assets/stone.png';
 let intervalId: number | null = null; // Interval ID を保存
 const debug: boolean = false;
 let frag = ref<number>(0);
-let dateClass = ref<string>("");
+let dateClass = ref<string>("dateblack");
 let scores = ref<number[]>([]); 
+const defparsent =  0.04;
+let endmonth = ref<number>(69);
+let extentNeeds = ref<number[]>([10,10]);
 //クラス管理************************************
 class Fild{
   image: string;
@@ -57,7 +60,7 @@ class Winter extends Fild{
     super(winter);
   }
   gotime():Fild{
-    if(Math.random()<0.3){
+    if(Math.random()<defparsent){
       return new Dirt();
     }else{
       return this;
@@ -70,7 +73,7 @@ class Dirt extends Fild{
     super(dirt);
   }
   gotime():Fild{
-    if(Math.random() < 0.3){
+    if(Math.random() < defparsent){
       return new Stone();
     }else{
       return this;
@@ -110,7 +113,7 @@ class Coty extends Fild{
     super(coty);
   }
   gotime():Fild{
-    if(Math.random()<0.3){
+    if(Math.random()<defparsent){
       return new Tree();
     }
     return this;
@@ -149,7 +152,7 @@ class Deadtree extends Fild{
     }
   }
   gotime():Fild{
-    if(Math.random() < 0.5){
+    if(Math.random() < defparsent){
       return new Kusa()
     }
     return this;
@@ -169,7 +172,10 @@ class Stone extends Fild{
     super(isi);
   }
   gotime():Fild{
-    return new Dirt();
+    if(Math.random()<defparsent){
+      return new Dirt();
+    }
+    return this
   }
   doClick(matel:number):Fild{
     handNum.value[2] += mag.value;
@@ -182,7 +188,7 @@ class Kusa extends Fild{
     super(kusa)
   }
   gotime():Fild{
-    if(Math.random() <0.3){
+    if(Math.random() <defparsent){
       return new Ine()
     }
     return this;
@@ -210,7 +216,7 @@ class Fire extends Fild{
     super(fire);
   }
   gotime():Fild{
-    if(Math.random()<0.3){
+    if(Math.random()<defparsent){
       return new Fir();
     }
     return this;
@@ -222,7 +228,7 @@ class Fir extends Fild{
     super(fir);
   }
   gotime():Fild{
-    if(Math.random()<0.3){
+    if(Math.random()<defparsent){
       return new Dirt();
     }
     return this;
@@ -249,7 +255,7 @@ class Gcoty extends Fild{
     super(gcoty);
   }
   gotime():Fild{
-    if(Math.random()<0.3){
+    if(Math.random()<defparsent){
       return new Gosinnboku();
     }
     return this;
@@ -261,7 +267,7 @@ class Gosinnboku extends Fild{
     super(gosinnboku);
   }
   gotime():Fild{
-    if(Math.random()<0.3){
+    if(Math.random()<defparsent){
       mag.value++;
     }
     return this;
@@ -324,8 +330,8 @@ const fetchDataInInterval = () => {
       console.log("倍率",mag.value);
     }
     time.value++;
-    //6年12月になったら終了
-    if(time.value == 69){
+    //6週で終了
+    if(time.value/10 > endmonth.value){
       frag.value = 0
       if (intervalId) {
         clearInterval(intervalId);
@@ -336,7 +342,7 @@ const fetchDataInInterval = () => {
       window.confirm(`最終得点は${handNum.value[0]+handNum.value[1]+handNum.value[2]}点でした`)
     }
     //最後が近くなったら赤くする
-    if(time.value >= 57){
+    if(time.value/10 >= endmonth.value-9){
       dateClass.value = "red"
     }
     //冬の実装
@@ -348,7 +354,7 @@ const fetchDataInInterval = () => {
       }
     }
     console.log(winterFlag);
-    if((time.value+3)%12+1 == 1 && winterFlag){
+    if(time.value%100 == 0 && winterFlag){
       for(let i = 0;i<4;i++){
         fild_condition.value[i] = fild_condition.value[i].gowinter();
       }
@@ -359,9 +365,9 @@ const fetchDataInInterval = () => {
         fild_condition.value[i] = fild_condition.value[i].gotime();
       }
     }
-  }, debug ? 10000:3000)
+  }, debug ? 1000:300)
 }
-
+//フィールドクリック時
 function click(fildNum:number){
   fild_condition.value[fildNum] = fild_condition.value[fildNum].doClick(selection.value);
   if(handNum.value[selection.value-1] <= 0){
@@ -369,7 +375,25 @@ function click(fildNum:number){
   }
   console.log(fild_condition.value);
 }
-
+//延長クリック時
+function extent(){
+  let extendfrag = 1
+  if(handNum.value[1] < extentNeeds.value[1]){
+    extendfrag = 0
+  }
+  if(handNum.value[0] < extentNeeds.value[0]){
+    extendfrag = 0
+  }
+  if(extendfrag == 1){
+    handNum.value[1]-= extentNeeds.value[1];
+    handNum.value[0]-= extentNeeds.value[0];
+    extentNeeds.value[1] = extentNeeds.value[1]*2+Math.floor(Math.random()*5);
+    extentNeeds.value[0] = extentNeeds.value[0]*5+Math.floor(Math.random()*10);
+    endmonth.value = endmonth.value + 10;
+    dateClass.value = "dateblack";
+  }
+}
+//初期化関数
 const startgame = ()=>{
   let scoresString:string[] = []
   if(localStorage.getItem("score")){
@@ -390,10 +414,10 @@ const startgame = ()=>{
     }
     scores.value.splice(p,0,scoreNumber)
   }
-  dateClass.value = "";
+  dateClass.value = "dateblack";
   handNum.value =[1, 0, 0];
   selection.value = 0;
-  time.value = 0;
+  time.value = 1;
   mag.value = 1;
   fild_condition.value = [new Dirt(),new Dirt(),new Dirt(),new Dirt()];
   frag.value = 1
@@ -405,26 +429,40 @@ const startgame = ()=>{
 <template>
   <div v-if = "frag == 0">
     <button @click = "startgame" class = "startButton">開始</button>
+    <table>
+    <tbody>
+      <tr v-for = "s in Math.min(scores.length,5)">
+        <td>{{ scores[s-1] }}</td>
+      </tr>
+    </tbody>
+  </table>
     </div>
     <div v-else>
       <div v-bind:class = "dateClass">
-  {{ Math.floor(time / 12)+1 }}年度{{ (time+3)%12+1 }}月
+  <div>{{ Math.floor(time/10) }} 月 / {{endmonth}} 月 </div>
+  <div :style = "{ backgroundColor:`rgb(256,${0.90**((endmonth-70)/100)*250},0)`,border:`2px solid black`,width:`200px`}" v-on:click="extent">
+    延長 {{endmonth}}&rarr;{{endmonth+10}}<br>
+    <img className = "magn" v-bind:src = "wood"/>
+    x{{extentNeeds[0]}}<br>
+    <img className = "magn" v-bind:src = "mugi"/>
+    x{{extentNeeds[1]}}
+  </div>
   </div>
   <!-- フィールドの状態を描画 -->
   <table class = "rey">
     <tr>
-      <td>
+      <td className = "fild">
         <img v-bind:src = "fild_condition[0].image" v-on:click = "click(0)"/>
       </td>
-      <td>
+      <td className = "fild">
         <img v-bind:src = "fild_condition[1].image" v-on:click = "click(1)"/>
       </td>
     </tr>
-    <tr>
-      <td>
+    <tr >
+      <td className = "fild">
         <img v-bind:src ="fild_condition[2].image" v-on:click = "click(2)"/>
       </td>
-      <td>
+      <td className = "fild">
         <img v-bind:src = "fild_condition[3].image" v-on:click = "click(3)"/>
       </td>
     </tr>
@@ -432,8 +470,7 @@ const startgame = ()=>{
   <!-- 手札を描画 -->
   <table class = "rey">
     <tr>
-      <td v-for = "matel in materialJpgs.length" >
-
+      <td v-for = "matel in materialJpgs.length">
         <div v-if="matel== selection" v-on:click = "select(matel)">
         x{{ handNum[matel-1] }}
         <div v-bind:class = "selectMaterialcolors[matel-1]">
@@ -459,9 +496,11 @@ const startgame = ()=>{
   </table>
   <p>倍率:x{{ mag }}</p>
   <table>
-    <tr v-for = "s in Math.min(scores.length,5)">
-      <td>{{ scores[s-1] }}</td>
-    </tr>
+    <tbody>
+      <tr v-for = "s in Math.min(scores.length,5)">
+        <td>{{ scores[s-1] }}</td>
+      </tr>
+    </tbody>
   </table>
   </div>
 </template>
