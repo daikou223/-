@@ -13,14 +13,18 @@ a{
   transition: 0.4s;
   padding: 3px;
 }
-td img{
-  width:130px;
+td.fild img{
+  width:100px;
+  height:100px;
   margin:10px;
 }
 td div img{
   width:60px;
+  margin:10px;
 }
-
+.magn{
+  width:20px;
+}
 .green{
   height:80px;
   background-color:lightgreen;
@@ -97,7 +101,11 @@ td div img{
   border:2px solid black;
 }
 .red{
-  color:red
+  color:red;
+  display:flex;
+}
+.dateblack{
+  display:flex;
 }
 .startButton{
   width:200px;
