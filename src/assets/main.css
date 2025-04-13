@@ -112,7 +112,10 @@ td div img{
   height:100px;
   font-size:30px;
 }
-
+.month{
+  width:60px;
+  margin:10px;
+}
 @media (hover: hover) {
   a:hover {
     background-color: hsla(160, 100%, 37%, 0.2);
