@@ -29,9 +29,13 @@ const debug: boolean = false;
 let frag = ref<number>(0);
 let dateClass = ref<string>("dateblack");
 let scores = ref<number[]>([]); 
-const defparsent =  0.04;
+const updateTime = 1000;
+const monthTime = 3000;
+const defparsent =  0.1/(monthTime/updateTime)*5;
+const middleParsent =  0.1/(monthTime/updateTime)*10;
 let endmonth = ref<number>(69);
 let extentNeeds = ref<number[]>([10,10]);
+let gosinnbokuLv = ref<number>(1);
 //クラス管理************************************
 class Fild{
   image: string;
@@ -60,7 +64,7 @@ class Winter extends Fild{
     super(winter);
   }
   gotime():Fild{
-    if(Math.random()<defparsent){
+    if(Math.random()<defparsent || (time.value/(monthTime/updateTime))%10 >= 6){
       return new Dirt();
     }else{
       return this;
@@ -158,7 +162,6 @@ class Deadtree extends Fild{
     return this;
   }
   ignition():Fild{
-    console.log(handNum.value[2],"発火")
     if(handNum.value[2] >= 1){
       handNum.value[2]--;
       return new Fire()
@@ -212,24 +215,36 @@ class Ine extends Fild{
 }
 
 class Fire extends Fild{
+  level:number;
   constructor(){
     super(fire);
+    this.level = 3;
   }
   gotime():Fild{
     if(Math.random()<defparsent){
-      return new Fir();
+      this.level-=1;
+      if(this.level == 0){
+        return new Fir();
+      }
+      return this
     }
     return this;
   }
 }
 
 class Fir extends Fild{
+  level:number;
   constructor(){
     super(fir);
+    this.level = 3
   }
   gotime():Fild{
     if(Math.random()<defparsent){
-      return new Dirt();
+      this.level-=1;
+      if(this.level == 0){
+        return new Fir();
+      }
+      return this
     }
     return this;
   }
@@ -267,10 +282,14 @@ class Gosinnboku extends Fild{
     super(gosinnboku);
   }
   gotime():Fild{
-    if(Math.random()<defparsent){
-      mag.value++;
+    if(Math.random()<1-(1-defparsent)**gosinnbokuLv.value){
+      mag.value += 1;
     }
     return this;
+  }
+  doClick(matel:number):Fild{
+    handNum.value[0]+= handNum.value[0] += (Math.floor(Math.random()*5)+3)*mag.value;
+    return new Dirt()
   }
 }
 
@@ -314,58 +333,13 @@ let fild_condition = ref<Fild[]>([new Dirt(),new Dirt(),new Dirt(),new Dirt()]);
 //関数*********************************************
 //アイテムを選択したときの関数
 function select(selectTo:number){
-  if(selection.value !== selectTo){
-    selection.value = selectTo
-  }else if(selection.value == selectTo){
-    selection.value = 0;
+  if(handNum.value[selectTo-1] != 0){
+    if(selection.value !== selectTo){
+      selection.value = selectTo
+    }else if(selection.value == selectTo){
+      selection.value = 0;
+    }
   }
-}
-
-//時間変化を実装
-const fetchDataInInterval = () => {
-  intervalId = setInterval(() => {
-    if(debug){
-      console.log("手持ち",handNum.value);
-      console.log("フィールド",fild_condition.value);
-      console.log("倍率",mag.value);
-    }
-    time.value++;
-    //6週で終了
-    if(time.value/10 > endmonth.value){
-      frag.value = 0
-      if (intervalId) {
-        clearInterval(intervalId);
-        intervalId = null;
-      }
-      scores.value.push(handNum.value[0]+handNum.value[1]+handNum.value[2])
-      localStorage.setItem("score",scores.value.join(" "))
-      window.confirm(`最終得点は${handNum.value[0]+handNum.value[1]+handNum.value[2]}点でした`)
-    }
-    //最後が近くなったら赤くする
-    if(time.value/10 >= endmonth.value-9){
-      dateClass.value = "red"
-    }
-    //冬の実装
-    //火が存在するなら、冬を迎えない
-    let winterFlag = true;
-    for(let i = 0;i<4;i++){
-      if(fild_condition.value[i] instanceof Fire){
-        winterFlag = false
-      }
-    }
-    console.log(winterFlag);
-    if(time.value%100 == 0 && winterFlag){
-      for(let i = 0;i<4;i++){
-        fild_condition.value[i] = fild_condition.value[i].gowinter();
-      }
-    }else{
-      //時間経過
-      console.log(fild_condition.value);
-      for(let i = 0;i<4;i++){
-        fild_condition.value[i] = fild_condition.value[i].gotime();
-      }
-    }
-  }, debug ? 1000:300)
 }
 //フィールドクリック時
 function click(fildNum:number){
@@ -373,7 +347,6 @@ function click(fildNum:number){
   if(handNum.value[selection.value-1] <= 0){
     selection.value = 0;
   }
-  console.log(fild_condition.value);
 }
 //延長クリック時
 function extent(){
@@ -388,9 +361,15 @@ function extent(){
     handNum.value[1]-= extentNeeds.value[1];
     handNum.value[0]-= extentNeeds.value[0];
     extentNeeds.value[1] = extentNeeds.value[1]*2+Math.floor(Math.random()*5);
-    extentNeeds.value[0] = extentNeeds.value[0]*5+Math.floor(Math.random()*10);
+    extentNeeds.value[0] = extentNeeds.value[0]*3+Math.floor(Math.random()*5);
     endmonth.value = endmonth.value + 10;
     dateClass.value = "dateblack";
+  }
+}
+function gacha(){
+  if(handNum.value[2] >= gosinnbokuLv.value**3){
+    handNum.value[2] -= gosinnbokuLv.value**3;
+    gosinnbokuLv.value += 1;
   }
 }
 //初期化関数
@@ -398,7 +377,6 @@ const startgame = ()=>{
   let scoresString:string[] = []
   if(localStorage.getItem("score")){
     const storedScore = localStorage.getItem("score");
-    console.log(storedScore);
     if(storedScore !== null){
       scoresString = storedScore.split(" ");
     }
@@ -424,6 +402,129 @@ const startgame = ()=>{
   fetchDataInInterval();
 }
 // コンポーネントがマウントされたら定期実行を開始
+let scoresString:string[] = []
+if(localStorage.getItem("score")){
+  const storedScore = localStorage.getItem("score");
+  if(storedScore !== null){
+    scoresString = storedScore.split(" ");
+  }
+}
+scores.value = []
+for(let i = 0;i<scoresString.length;i++){
+  let scoreNumber = Number(scoresString[i])
+  let p = 0
+  for(let j = 0;j<scores.value.length;j++){
+    if(scores.value[j] > scoreNumber){
+      p++
+    }
+  }
+  scores.value.splice(p,0,scoreNumber)
+}
+//時間変化を実装
+const fetchDataInInterval = () => {
+  intervalId = setInterval(() => {
+    if(debug){
+      console.log("手持ち",handNum.value);
+      console.log("フィールド",fild_condition.value);
+      console.log("倍率",mag.value);
+    }
+    time.value++;
+    if(time.value/(monthTime/updateTime) > endmonth.value){
+      frag.value = 0
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+      scores.value.push(handNum.value[0]+handNum.value[1]+handNum.value[2])
+      localStorage.setItem("score",scores.value.join(" "))
+      window.confirm(`最終得点は${handNum.value[0]+handNum.value[1]+handNum.value[2]}点でした`)
+      let scoresString:string[] = []
+      if(localStorage.getItem("score")){
+        const storedScore = localStorage.getItem("score");
+        if(storedScore !== null){
+          scoresString = storedScore.split(" ");
+        }
+      }
+  scores.value = []
+  for(let i = 0;i<scoresString.length;i++){
+    let scoreNumber = Number(scoresString[i])
+    let p = 0
+    for(let j = 0;j<scores.value.length;j++){
+      if(scores.value[j] > scoreNumber){
+        p++
+      }
+    }
+    scores.value.splice(p,0,scoreNumber)
+  }
+    }
+    //最後が近くなったら赤くする
+    if(time.value/(monthTime/updateTime) >= endmonth.value-9){
+      dateClass.value = "red"
+    }
+    //冬の実装
+    //火が存在するなら、冬を迎えない
+    let winterFlag = true;
+    for(let i = 0;i<4;i++){
+      if(fild_condition.value[i] instanceof Fire){
+        winterFlag = false
+      }
+    }
+    if((time.value/(monthTime/updateTime))%10 == 0 && winterFlag){
+      for(let i = 0;i<4;i++){
+        fild_condition.value[i] = fild_condition.value[i].gowinter();
+      }
+    }else{
+      //時間経過
+      for(let i = 0;i<4;i++){
+        fild_condition.value[i] = fild_condition.value[i].gotime();
+      }
+    }
+  }, updateTime)
+}
+//キーボード走査
+function eventLit(){
+  document.addEventListener('keyup', (event) => {
+  if(frag.value ==1){
+    if (event.key === 'o') {
+      click(1);
+    } 
+    if (event.key === 'i') {
+      click(0);
+    } 
+    if(event.key === 'l'){
+      click(3)
+    }
+    if (event.key === 'k') {
+      click(2);
+    } 
+    if (event.key === '0') {
+      select(0);
+    } 
+    if (event.key === '1') {
+      select(1);
+    } 
+    if (event.key === '2') {
+      select(2);
+    } 
+    if (event.key === '3') {
+      select(3);
+    } 
+    if (event.key === 'q') {
+      extent();
+    } 
+    if (event.key === 'w') {
+      gacha();
+    } 
+  }
+  if(event.key === ' '){
+    if(frag.value == 0){
+      startgame();
+     }
+  }
+  })};
+onMounted(()=>{
+  eventLit()
+})
 </script>
 
 <template>
@@ -432,20 +533,26 @@ const startgame = ()=>{
     <table>
     <tbody>
       <tr v-for = "s in Math.min(scores.length,5)">
-        <td>{{ scores[s-1] }}</td>
+        <td>{{s}}位:</td><td>{{ scores[s-1] }}</td>
       </tr>
     </tbody>
   </table>
     </div>
     <div v-else>
       <div v-bind:class = "dateClass">
-  <div>{{ Math.floor(time/10) }} 月 / {{endmonth}} 月 </div>
-  <div :style = "{ backgroundColor:`rgb(256,${0.90**((endmonth-70)/100)*250},0)`,border:`2px solid black`,width:`200px`}" v-on:click="extent">
+  <div className = "month" >{{ Math.floor(time/(monthTime/updateTime)) }} 月 <br>&nbsp;/ {{endmonth}} 月<br>
+    <p>倍率:x{{ mag }}</p> </div>
+  <div :style = "{ backgroundColor:`rgb(256,${0.90**((endmonth-70)/100)*250},0)`,border:`2px solid black`,width:`100px`,height:`80px`,margin:`10px`}" v-on:click="extent">
     延長 {{endmonth}}&rarr;{{endmonth+10}}<br>
     <img className = "magn" v-bind:src = "wood"/>
     x{{extentNeeds[0]}}<br>
     <img className = "magn" v-bind:src = "mugi"/>
     x{{extentNeeds[1]}}
+  </div>
+  <div :style = "{ backgroundColor:`rgb(200,200,200)`,border:`2px solid black`,width:`100px`,height:`80px`,margin:`10px`}" v-on:click="gacha">
+    ご神木ランク {{gosinnbokuLv}}&rarr;{{gosinnbokuLv+1}}<br>
+    <img className = "magn" v-bind:src = "stone"/>
+    x{{gosinnbokuLv**3}}<br>
   </div>
   </div>
   <!-- フィールドの状態を描画 -->
@@ -494,11 +601,10 @@ const startgame = ()=>{
       </td>
     </tr>
   </table>
-  <p>倍率:x{{ mag }}</p>
   <table>
     <tbody>
       <tr v-for = "s in Math.min(scores.length,5)">
-        <td>{{ scores[s-1] }}</td>
+        <td>{{ s }}位 : </td><td>{{ scores[s-1] }}</td>
       </tr>
     </tbody>
   </table>
